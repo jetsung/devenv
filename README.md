@@ -9,8 +9,30 @@ curl -L https://s.asfd.cn/514b875c | CDN=https://fastfile.asfd.cn/ bash -s -- $U
 ```
 
 ## 编程语言
+### 1. Go 语言
+https://go.dev/
 
-### 1. Zig 语言
+**1. 安装**
+```bash
+curl -fsSL https://framagit.org/jetsung/golang-install/-/raw/main/gvm.sh | bash
+
+# 短址
+curl -L https://s.asfd.cn/golang | bash
+```
+
+**2. 配置**   
+环境变量
+```bash
+## GOLANG
+export GOROOT="$HOME/.gvm/go"
+export GOPATH="$HOME/go"
+export GOBIN="$GOPATH/bin"
+export GOPROXY="https://goproxy.cn,https://goproxy.io,direct"
+export PATH="$PATH:$GOROOT/bin:$GOBIN" 
+```
+
+## 开发工具
+### Bun
 https://bun.sh/
 
 **1. 安装**
