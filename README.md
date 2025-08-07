@@ -1,63 +1,131 @@
-# Linux 平台软件开发环境配置
+# 开发环境
 
-`Linux` 平台软件开发环境配置 For `Jetsung Chan`
+基于 [**Docker**](https://docs.docker.com/engine/install/debian/) + [**Debian:12-slim**](https://hub.docker.com/_/debian) + [**Nix**](https://github.com/NixOS) 的容器内开发环境
 
-## 全局安装
-```bash
-URL=<http://xxx.com/xxx.sh>
-curl -L https://s.asfd.cn/514b875c | CDN=https://fastfile.asfd.cn/ bash -s -- $URL | bash
+## 特征
+
+- [Nix nixpkgs 25.05](https://github.com/NixOS/nixpkgs/releases/tag/25.05)
+- 系统级主要组件：
+    ```bash
+    openssh-server
+    xz-utils
+    curl
+    wget
+    tree
+    make
+    git
+    vim
+    docker
+    unzip
+    gzip
+    ```
+- 编程语言：
+    ```bash
+    Rust
+    Go
+    NodeJS
+    uv
+    ```
+- 环境级组件：
+    ```
+    zoxide
+    hugo
+    skopeo
+    ```
+
+## 运行
+
+- `compose.yml`
+```yaml
+services:
+  devenv:
+    image: jetsung/devenv:latest
+    container_name: devenv
+    hostname: devenv
+    restart: unless-stopped
+    privileged: true
+    env_file:
+    - ./.env
+    # - ./cn.env
+    ports:
+    - ${SSH_PORT:-32222}:32222
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - $HOME/workspaces:/workspaces
 ```
 
-## 编程语言
-### 1. Go 语言
-https://go.dev/
-
-**1. 安装**
+- `.env`
 ```bash
-curl -fsSL https://framagit.org/jetsung/golang-install/-/raw/main/gvm.sh | bash
-
-# 短址
-curl -L https://s.asfd.cn/golang | bash
+TZ=Asia/Shanghai
+SSH_PORT=32222
 ```
 
-**2. 配置**   
-环境变量
+- `cn.env`
 ```bash
-## GOLANG
-export GOROOT="$HOME/.gvm/go"
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
-export GOPROXY="https://goproxy.cn,https://goproxy.io,direct"
-export PATH="$PATH:$GOROOT/bin:$GOBIN" 
+## uv
+UV_DEFAULT_INDEX=https://mirrors.aliyun.com/pypi/simple/
+
+## rust
+RUSTUP_DIST_SERVER=https://rsproxy.cn
+RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup
+
+## nodejs
+NVM_NODEJS_ORG_MIRROR=https://mirrors.ustc.edu.cn/node/
+NODE_MIRROR=https://mirrors.ustc.edu.cn/node/
+
+## go
+GOPROXY=https://goproxy.cn,https://goproxy.io,direct
 ```
 
-## 开发工具
-### Bun
-https://bun.sh/
+## 其它设置
 
-**1. 安装**
+- 设置时区
+    - 外部文件 `compose.yml`
+        ```bash
+        TZ=Asia/Shanghai
+        ```
+    
+    - 容器内设置
+        ```bash
+        ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+        ```
+
+## 构建
+
+### 本地构建
 ```bash
-# 默认
-curl -fsSL https://bun.sh/install | bash
+# 预览构建信息
+docker buildx bake --print
 
-# 指定 GitHub
-curl -fsSL https://bun.sh/install | GITHUB=https://filetas.asfd.cn/https://github.com bash
-
-# 指定 CDN
-curl -L https://s.asfd.cn/514b875c | CDN=https://filetas.asfd.cn/ bash -s -- https://bun.sh/install | bash
+# 执行构建
+docker buildx bake
 ```
 
-**2. 配置**   
-环境变量
+**测试**
 ```bash
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-```
-镜像加速
-```bash
-# cat ~/.bunfig.toml   
-# ~/.bunfig.toml
-[install]
-registry = "https://registry.npmmirror.com/"
+docker run --rm -it devenv:local bash
+
+# 容器内执行
+dev
+
+# 依次执行
+go version
+python --version
+uv --version
+rustup default stable
 ```
 
+## Nix 基础教程
+- 添加软件
+```bash
+vi /etc/nix/devflake/flake.nix
+
+# 向 “buildInputs = with pkgs; [ " 内添加软件
+```
+
+- 配置环境变量
+```bash
+vi /etc/nix/devflake/flake.nix
+
+# 在 shellHook = '' 内添加环境变量
+```
