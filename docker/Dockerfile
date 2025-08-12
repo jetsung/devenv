@@ -23,7 +23,12 @@ apt-get install -y --no-install-recommends \
     tree \
     openssh-server \
     net-tools \
-    jq
+    jq \
+    locales
+
+# 配置中文环境
+sed -i -e 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
 
 # 安装 Docker CLI
 install -m 0755 -d /etc/apt/keyrings
@@ -151,6 +156,11 @@ RUN <<EOF
 nix --version
 nix flake metadata /etc/nix/devflake --extra-experimental-features 'nix-command flakes'
 EOF
+
+# 设置默认语言环境为中文
+ENV LANG zh_CN.UTF-8
+ENV LANGUAGE zh_CN:zh
+ENV LC_ALL zh_CN.UTF-8
 
 # 暴露 SSH 端口 (32222)
 EXPOSE 32222

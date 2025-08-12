@@ -1,28 +1,48 @@
+default:
+  image: docker:latest
+  services:
+    - name: docker:dind
+      variables:
+        HEALTHCHECK_TCP_PORT: "2375"
+#     command: ["--registry-mirror", "https://docker.m.daocloud.io" ]
+
+  before_script:
+    - docker info 
+
 variables:
-  # 使用 docker-in-docker 驱动
-  DOCKER_DRIVER: overlay2
-  # 启用 BuildKit
-  DOCKER_BUILDKIT: 1
+  # When using dind service, you must instruct Docker to talk with
+  # the daemon started inside of the service. The daemon is available
+  # with a network connection instead of the default
+  # /var/run/docker.sock socket.
+  # DOCKER_HOST: tcp://docker:2375
+  #
+  # The 'docker' hostname is the alias of the service container as described at
+  # https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
+  # If you're using GitLab Runner 12.7 or earlier with the Kubernetes executor and Kubernetes 1.6 or earlier,
+  # the variable must be set to tcp://localhost:2376 because of how the
+  # Kubernetes executor connects services to the job container
+  # DOCKER_HOST: tcp://localhost:2376
+  #
+  # This instructs Docker not to start over TLS.
+  DOCKER_TLS_CERTDIR: ""
+  TZ: Asia/Shanghai
   # 定义镜像名称
-  IMAGE_NAME: $CI_REGISTRY_IMAGE
-
-services:
-  - docker:dind
-
-stages:
-  - build
+  IMAGE_NAME: jetsung/devenv
 
 build:
   stage: build
-  image: docker:latest
+  tags:
+    - docker  
   before_script:
     # 登录到 GitLab 容器镜像库
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin ${IMAGE_REGISTRY:-docker.io}
     # 安装 buildx
     - docker buildx install
   script:
+    # 指定 --driver docker-container，支持多平台构建
+    - docker buildx create --name mybuilder --driver docker-container --use
     # 使用 buildx bake 构建并推送镜像
-    - docker buildx bake --set "*.cache-from=type=registry,ref=$IMAGE_NAME:cache" --set "*.cache-to=type=registry,ref=$IMAGE_NAME:cache,mode=max" --set "release.tags=$IMAGE_NAME:latest,$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" --push release
-  rules:
-    # 仅在 main 分支上运行
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - docker buildx bake --set "release.tags=$IMAGE_NAME:latest" --set "release.tags=$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" --push release
+  # rules:
+  #   # 仅在 main 分支上运行
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
