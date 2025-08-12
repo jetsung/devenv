@@ -1,10 +1,10 @@
 # 开发环境
 
-基于 [**Docker**](https://docs.docker.com/engine/install/debian/) + [**Debian:12-slim**](https://hub.docker.com/_/debian) + [**Nix**](https://github.com/NixOS) 的容器内开发环境
+基于 [**Docker**](https://docs.docker.com/engine/install/debian/) + [**trixie-slim**(13)](https://hub.docker.com/_/debian) + [**Nix**](https://github.com/NixOS) 的容器内开发环境
 
 ## 特征
 
-- [Nix nixpkgs 25.05](https://github.com/NixOS/nixpkgs/releases/tag/25.05)
+- [Nix nixpkgs unstable](https://github.com/NixOS/nixpkgs/tree/nixpkgs-unstable)
 - 系统级主要组件：
     ```bash
     openssh-server
@@ -18,6 +18,7 @@
     docker
     unzip
     gzip
+    jq
     ```
 - 编程语言：
     ```bash
@@ -26,11 +27,10 @@
     NodeJS
     uv
     ```
-- 环境级组件：
+- 可手动安装组件：
     ```
-    zoxide
-    hugo
-    skopeo
+    EXTS="zoxide hugo skopeo"
+    for ext in $EXTS; do curl -L "s.fx4.cn/$ext" | bash; done 
     ```
 
 ## 运行
@@ -51,7 +51,9 @@ services:
     - ${SSH_PORT:-32222}:32222
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - $HOME/workspaces:/workspaces
+    - ${HOME:-/srv}/workspaces:/workspaces
+    - ./data/.ssh:/root/.ssh
+    - ./data/.vscode-server:/root/.vscode-server
 ```
 
 - `.env`
@@ -84,7 +86,7 @@ GOPROXY=https://goproxy.cn,https://goproxy.io,direct
         ```bash
         TZ=Asia/Shanghai
         ```
-    
+
     - 容器内设置
         ```bash
         ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -110,9 +112,11 @@ dev
 
 # 依次执行
 go version
-python --version
 uv --version
 rustup default stable
+
+# 安装全局 Python
+uv python install --default
 ```
 
 ## Nix 基础教程

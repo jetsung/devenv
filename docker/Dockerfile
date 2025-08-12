@@ -1,4 +1,4 @@
-FROM debian:12-slim
+FROM debian:trixie-slim
 
 # 避免交互提示
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,7 +21,9 @@ apt-get install -y --no-install-recommends \
     git \
     vim \
     tree \
-    openssh-server
+    openssh-server \
+    net-tools \
+    jq
 
 # 安装 Docker CLI
 install -m 0755 -d /etc/apt/keyrings
@@ -59,7 +61,7 @@ echo 'experimental-features = nix-command flakes' >> /etc/nix/nix.conf
 mkdir -p /etc/nix/devflake
 cat > /etc/nix/devflake/flake.nix <<'FLAKE'
 {
-  description = "Global dev shell with Rust, Go, Python 3.13";
+  description = "Global dev shell with nixpkgs-unstable";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
@@ -117,6 +119,22 @@ EOF
 # 配置 PATH
 RUN <<EOF
 echo 'export PATH="/root/.local/bin:$PATH"' >> /etc/bash.bashrc
+EOF
+
+# 修复 VSCode
+RUN <<EOF
+(
+  echo ''
+  echo '# VSCode fix: only load nix and bashrc if in VSCode remote shell'
+  echo 'if [ -d /root/.vscode-server ]; then'
+  echo '  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix.sh ]; then'
+  echo '    . /nix/var/nix/profiles/default/etc/profile.d/nix.sh'
+  echo '  fi'
+  echo '  if [ -f /etc/bash.bashrc ]; then'
+  echo '    . /etc/bash.bashrc'
+  echo '  fi'
+  echo 'fi'
+) >> /root/.bashrc
 EOF
 
 # 确保非 root 用户可以访问 Nix

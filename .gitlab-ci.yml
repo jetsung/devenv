@@ -1,0 +1,28 @@
+variables:
+  # 使用 docker-in-docker 驱动
+  DOCKER_DRIVER: overlay2
+  # 启用 BuildKit
+  DOCKER_BUILDKIT: 1
+  # 定义镜像名称
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+
+services:
+  - docker:dind
+
+stages:
+  - build
+
+build:
+  stage: build
+  image: docker:latest
+  before_script:
+    # 登录到 GitLab 容器镜像库
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    # 安装 buildx
+    - docker buildx install
+  script:
+    # 使用 buildx bake 构建并推送镜像
+    - docker buildx bake --set "*.cache-from=type=registry,ref=$IMAGE_NAME:cache" --set "*.cache-to=type=registry,ref=$IMAGE_NAME:cache,mode=max" --set "release.tags=$IMAGE_NAME:latest,$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" --push release
+  rules:
+    # 仅在 main 分支上运行
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
