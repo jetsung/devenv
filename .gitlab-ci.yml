@@ -1,13 +1,12 @@
-default:
-  image: docker:latest
-  services:
-    - name: docker:dind
-      variables:
-        HEALTHCHECK_TCP_PORT: "2375"
+image: docker:latest
+services:
+  - name: docker:dind
+    variables:
+      HEALTHCHECK_TCP_PORT: "2375"
 #     command: ["--registry-mirror", "https://docker.m.daocloud.io" ]
 
-  before_script:
-    - docker info 
+before_script:
+  - docker info 
 
 variables:
   # When using dind service, you must instruct Docker to talk with
@@ -29,8 +28,10 @@ variables:
   # 定义镜像名称
   IMAGE_NAME: jetsung/devenv
 
-build:
+build-multi:
   stage: build
+  rules:
+    - when: never  
   tags:
     - docker  
   before_script:
@@ -43,6 +44,30 @@ build:
     - docker buildx create --name mybuilder --driver docker-container --use
     # 使用 buildx bake 构建并推送镜像
     - docker buildx bake --set "release.tags=$IMAGE_NAME:latest" --set "release.tags=$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" --push release
+  # rules:
+  #   # 仅在 main 分支上运行
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build-latest:
+  stage: build
+  # rules:
+  #   - when: never  
+  tags:
+    - docker  
+  before_script:
+    # 登录到 GitLab 容器镜像库
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin ${IMAGE_REGISTRY:-docker.io}
+    - docker buildx install
+
+  script:
+    - |
+      if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]; then
+        DOCKER_TAG="$IMAGE_NAME:latest"
+      else
+        DOCKER_TAG="$IMAGE_NAME:develop"
+      fi
+    # 使用 buildx bake 构建并推送镜像
+    - docker buildx bake --set "default.tags=$DOCKER_TAG" --push
   # rules:
   #   # 仅在 main 分支上运行
   #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
