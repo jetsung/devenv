@@ -133,3 +133,10 @@ vi /etc/nix/devflake/flake.nix
 
 # 在 shellHook = '' 内添加环境变量
 ```
+
+## 仓库镜像
+
+- https://git.jetsung.com/jetsung/devenv
+- https://framagit.org/jetsung/devenv
+- https://gitcode.com/jetsung/devenv
+- https://github.com/jetsung/devenv
