@@ -1,6 +1,6 @@
 # 开发环境
 
-基于 [**Docker**](https://docs.docker.com/engine/install/debian/) + [**trixie-slim**(13)](https://hub.docker.com/_/debian) + [**Nix**](https://github.com/NixOS) 的容器内开发环境
+基于 [**Docker**](https://docs.docker.com/engine/install/debian/) + [**debian:trixie-slim**(13)](https://hub.docker.com/_/debian) + [**Nix**](https://github.com/NixOS) 的容器内开发环境
 
 ## 特征
 
