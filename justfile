@@ -90,6 +90,22 @@ softs package *args:
         exit 1; \
     fi
 
+#################### Softs Directory ###################
+
+# 软件包方式安装软件
+[group('flatpak')]
+flatpak package *args:
+    @if [[ "{{package}}" == "list" ]]; then \
+        echo "Available flatpak:"; \
+        ls -1 ./flatpak/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./flatpak/{{package}}.sh" ]]; then \
+        echo "Flatpak ({{package}}) ..."; \
+        bash "./flatpak/{{package}}.sh" {{args}}; \
+    else \
+        echo "Error: Flatpak '{{package}}' not found in ./flatpak/"; \
+        exit 1; \
+    fi
+
 #################### Web Directory ####################
 
 lark:
