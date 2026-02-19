@@ -14,10 +14,13 @@ install package:
         echo "Installing all packages..." ; \
         find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./settings/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
     else \
-        echo "Installing ({{package}}) ..." ;\
-        echo ;\
         find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./settings/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
     fi
+
+# 搜索可安装的软件
+search package:
+	@echo "=== Available Soft ==="; \
+	find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./.git/*" -not -path "./utils/*" -not -path "./settings/*" -print0; echo ""
 
 # 显示所有可安装的软件
 show:
