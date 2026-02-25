@@ -84,7 +84,7 @@ install_wechat() {
             print_msg "$YELLOW" "正在下载微信 DEB 包..."
             if curl -fsSL -o "$pkg_file" "$download_url"; then
                 print_msg "$GREEN" "下载完成，正在安装..."
-                sudo dpkg -i "$pkg_file" || sudo apt-get install -f -y
+                sudo dpkg -i "$pkg_file" || sudo apt install -f -y
                 print_msg "$GREEN" "微信安装成功！"
             else
                 print_msg "$RED" "下载失败，请检查网络连接"
