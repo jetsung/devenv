@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+FLATPAK_ID="org.gimp.GIMP"
+CMD="flatpak install flathub $FLATPAK_ID"
+
 echo "https://www.gimp.org/downloads/"
 
-echo "https://flathub.org/en/apps/org.gimp.GIMP"
-echo "flatpak install flathub org.gimp.GIMP"
+echo "https://flathub.org/en/apps/$FLATPAK_ID"
+echo "$CMD"
 
-flatpak install flathub org.gimp.GIMP
+$CMD
