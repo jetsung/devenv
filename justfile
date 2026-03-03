@@ -1,9 +1,3 @@
-init:
-
-help:
-
-base:
-
 # 备份数据到腾讯云存储（COS）
 datasync:
     cd "$$HOME/myfiles" && rclone-datasync.sh
@@ -12,67 +6,67 @@ datasync:
 install package:
     @if [[ "{{package}}" == "all" ]]; then \
         echo "Installing all packages..." ; \
-        find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./settings/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
+        find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./setting/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
     else \
-        find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./settings/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
+        find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./setting/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
     fi
 
 # 搜索可安装的软件
 search package:
-	@echo "=== Available Soft ==="; \
-	find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./.git/*" -not -path "./utils/*" -not -path "./settings/*" -print0; echo ""
+	@echo "=== Available Application ==="; \
+	find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./.git/*" -not -path "./utils/*" -not -path "./setting/*" -print0; echo ""
 
 # 显示所有可安装的软件
 show:
-	@echo "=== Available Softs ==="; \
-	find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./.git/*" -not -path "./utils/*" -not -path "./settings/*" | xargs -n1 basename -s .sh | sed 's/^/    /' | sort -u
+	@echo "=== Available Application ==="; \
+	find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./.git/*" -not -path "./utils/*" -not -path "./setting/*" | xargs -n1 basename -s .sh | sed 's/^/    /' | sort -u
 
 
 #################### Setting Directory ###################
 
 # 设置环境
-[group('settings')]
-settings package *args:
+[group('setting')]
+setting package *args:
     @if [[ "{{package}}" == "list" ]]; then \
-        echo "Available settings:"; \
-        ls -1 ./settings/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
-    elif [[ -f "./settings/{{package}}.sh" ]]; then \
+        echo "Available setting:"; \
+        ls -1 ./setting/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./setting/{{package}}.sh" ]]; then \
         echo "Setting ({{package}}) ..."; \
-        bash "./settings/{{package}}.sh" {{args}}; \
+        bash "./setting/{{package}}.sh" {{args}}; \
     else \
-        echo "Error: Settings '{{package}}' not found in ./settings/"; \
+        echo "Error: Setting '{{package}}' not found in ./setting/"; \
         exit 1; \
     fi
 
 #################### Packages Directory ###################
 
 # 包管理方式安装软件
-[group('packages')]
-packages package *args:
+[group('package')]
+package package *args:
     @if [[ "{{package}}" == "list" ]]; then \
-        echo "Available packages:"; \
-        ls -1 ./packages/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
-    elif [[ -f "./packages/{{package}}.sh" ]]; then \
+        echo "Available package:"; \
+        ls -1 ./package/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./package/{{package}}.sh" ]]; then \
         echo "Packages ({{package}}) ..."; \
-        bash "./packages/{{package}}.sh" {{args}}; \
+        bash "./package/{{package}}.sh" {{args}}; \
     else \
-        echo "Error: Package '{{package}}' not found in ./packages/"; \
+        echo "Error: Package '{{package}}' not found in ./package/"; \
         exit 1; \
     fi
 
 #################### Scripts Directory ###################
 
 # 脚本方式安装软件
-[group('scripts')]
-scripts package *args:
+[group('script')]
+script package *args:
     @if [[ "{{package}}" == "list" ]]; then \
-        echo "Available scripts:"; \
-        ls -1 ./scripts/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
-    elif [[ -f "./scripts/{{package}}.sh" ]]; then \
+        echo "Available script:"; \
+        ls -1 ./script/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./script/{{package}}.sh" ]]; then \
         echo "Scripts ({{package}}) ..."; \
-        bash "./scripts/{{package}}.sh" {{args}}; \
+        bash "./script/{{package}}.sh" {{args}}; \
     else \
-        echo "Error: Script '{{package}}' not found in ./scripts/"; \
+        echo "Error: Script '{{package}}' not found in ./script/"; \
         exit 1; \
     fi
 
@@ -80,14 +74,14 @@ scripts package *args:
 #################### Softs Directory ###################
 
 # 软件包方式安装软件
-[group('softs')]
-softs package *args:
+[group('soft')]
+soft package *args:
     @if [[ "{{package}}" == "list" ]]; then \
-        echo "Available softs:"; \
-        ls -1 ./softs/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
-    elif [[ -f "./softs/{{package}}.sh" ]]; then \
-        echo "Softs ({{package}}) ..."; \
-        bash "./softs/{{package}}.sh" {{args}}; \
+        echo "Available soft:"; \
+        ls -1 ./soft/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./soft/{{package}}.sh" ]]; then \
+        echo "Soft ({{package}}) ..."; \
+        bash "./soft/{{package}}.sh" {{args}}; \
     else \
         echo "Error: Soft '{{package}}' not found in ./softs/"; \
         exit 1; \
@@ -111,5 +105,16 @@ flatpak package *args:
 
 #################### Web Directory ####################
 
-lark:
-    @bash ./web/lark.sh
+# Web方式安装软件（仅提供链接，需手动下载安装）
+[group('web')]
+web package *args:
+    @if [[ "{{package}}" == "list" ]]; then \
+        echo "Available web:"; \
+        ls -1 ./web/*.sh 2>/dev/null | xargs -n1 basename -s .sh | sed 's/^/  - /'; \
+    elif [[ -f "./web/{{package}}.sh" ]]; then \
+        echo "Web ({{package}}) ..."; \
+        bash "./web/{{package}}.sh" {{args}}; \
+    else \
+        echo "Error: Web '{{package}}' not found in ./web/"; \
+        exit 1; \
+    fi
