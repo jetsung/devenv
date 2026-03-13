@@ -61,6 +61,9 @@ install_wechat() {
     local download_url
     local pkg_file
 
+    print_msg "$GREEN" "https://linux.weixin.qq.com/"
+    echo
+
     print_msg "$YELLOW" "检测到架构: $arch"
     print_msg "$YELLOW" "检测到包管理器: $pkg_type"
 

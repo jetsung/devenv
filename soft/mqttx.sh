@@ -55,6 +55,9 @@ install_mqttx() {
     local download_url=$2
     local pkg_file
 
+    print_msg "$GREEN" "https://mqttx.app/zh/downloads"
+    echo
+    
     print_msg "$YELLOW" "正在下载 MQTTX 安装包..."
 
     case "$pkg_type" in
