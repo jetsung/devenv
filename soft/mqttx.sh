@@ -62,7 +62,7 @@ install_mqttx() {
             pkg_file="/tmp/mqttx.rpm"
             if curl -fsSL -o "$pkg_file" "$download_url"; then
                 print_msg "$GREEN" "下载完成，正在安装..."
-                sudo rpm -i "$pkg_file"
+                sudo dnf install -y "$pkg_file"
                 print_msg "$GREEN" "MQTTX 安装成功！"
             else
                 print_msg "$RED" "下载失败，请检查网络连接"

@@ -70,9 +70,17 @@ install_wechat() {
             pkg_file="/tmp/wechat.rpm"
             print_msg "$YELLOW" "正在下载微信 RPM 包..."
             if curl -fsSL -o "$pkg_file" "$download_url"; then
-                print_msg "$GREEN" "下载完成，正在安装..."
-                sudo rpm -i "$pkg_file"
-                print_msg "$GREEN" "微信安装成功！"
+                print_msg "$GREEN" "下载完成，正在检查安装状态..."
+                # 检查是否已安装微信
+                if rpm -q wechat &>/dev/null; then
+                    print_msg "$YELLOW" "检测到微信已安装，正在更新..."
+                    sudo dnf install -y "$pkg_file"
+                    print_msg "$GREEN" "微信更新成功！"
+                else
+                    print_msg "$YELLOW" "正在安装微信..."
+                    sudo dnf install -y "$pkg_file"
+                    print_msg "$GREEN" "微信安装成功！"
+                fi
             else
                 print_msg "$RED" "下载失败，请检查网络连接"
                 exit 1

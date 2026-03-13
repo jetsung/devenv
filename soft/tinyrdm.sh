@@ -43,7 +43,7 @@ install_tinyrdm() {
     case "$pkg_type" in
         rpm)
             pushd /tmp >/dev/null || exit
-            deb2rpm.sh "$pkg_file" ./tinyrdm && tinyrdm_path=$(find ./tinyrdm -type f -name "*.rpm") && sudo rpm -i "$tinyrdm_path"
+            deb2rpm.sh "$pkg_file" ./tinyrdm && tinyrdm_path=$(find ./tinyrdm -type f -name "*.rpm") && sudo dnf install -y "$tinyrdm_path"
             popd >/dev/null || exit
             ;;
         deb)
