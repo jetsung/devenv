@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-hostnamectl set-hostname --static fedora
+_hostname=$(hostnamectl | grep "Operating System" | awk '{print $3}' | tr '[:upper:]' '[:lower:]')
+hostnamectl set-hostname --static "${_hostname:-linux}"
