@@ -1,3 +1,5 @@
+set shell := ["bash", "-c"]
+
 # 备份数据到腾讯云存储（COS）
 datasync:
     cd "$$HOME/myfiles" && rclone-datasync.sh
