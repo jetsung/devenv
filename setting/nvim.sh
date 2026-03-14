@@ -33,8 +33,11 @@ main() {
     exit 1
   fi
 
-  # 卸载 vi
-  sudo dnf remove vim-minimal -y
+  # 若是 fedora / rhel 平台需要先删除 vi
+  if [[ -f "/etc/redhat-release" ]]; then
+    # 卸载 vi
+    sudo dnf remove vim-minimal -y
+  fi
 
   # 配置 alternatives
   configure_alternatives "vi" "/usr/bin/vi" 100
