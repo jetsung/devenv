@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: blesh.sh
+# Description: 安装 ble.sh Bash 行编辑增强工具
+# URL: https://github.com/akinomyoga/ble.sh
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 if [[ -f "$HOME/.local/share/blesh/ble.sh" ]]; then
     echo "ble.sh is already installed"
     exit 0

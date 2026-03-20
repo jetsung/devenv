@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+#============================================================
+# File: bitwarden.sh
+# Description: 安装 Bitwarden 密码管理器
+# URL: https://bitwarden.com/download/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-13
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
 
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'

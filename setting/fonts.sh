@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: fonts.sh
+# Description: 安装开发字体 (JetBrains Mono, Fira Code, Nerd Fonts)
+# URL: https://fx4.cn/fonts
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
 if [[ -n "${DEBUG:-}" ]]; then
     set -eux
 else

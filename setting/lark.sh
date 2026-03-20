@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: lark.sh
+# Description: 配置飞书桌面快捷方式
+# URL: https://www.larksuite.com/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 sudo sed -i 's#NoDisplay=.*#NoDisplay=false#' /usr/share/applications/bytedance-lark.desktop
 
 sudo update-desktop-database

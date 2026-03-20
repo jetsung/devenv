@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: tinyrdm.sh
+# Description: 安装 TinyRDM Redis 管理工具
+# URL: https://github.com/tiny-craft/tiny-rdm
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-13
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 # 颜色定义
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'

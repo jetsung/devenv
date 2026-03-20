@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: code.sh
+# Description: 安装 Visual Studio Code 和 VS Code Insiders
+# URL: https://code.visualstudio.com/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-14
+# UpdatedAt: 2026-03-14
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 install_dnf() {
     sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&
     echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\nautorefresh=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null

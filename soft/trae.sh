@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 #============================================================
-# File: lark.sh
-# Description: 安装飞书 Linux 客户端
-# URL: https://www.larksuite.com/
+# File: trae.sh
+# Description: 安装 Trae AI 编程助手
+# URL: https://www.trae.ai/
 # Author: Jetsung Chan <i@jetsung.com>
 # Version: 0.1.0
-# CreatedAt: 2026-03-13
-# UpdatedAt: 2026-03-13
+# CreatedAt: 2026-03-20
+# UpdatedAt: 2026-03-20
 #============================================================
 
 if [[ -n "${DEBUG:-}" ]]; then
@@ -21,28 +21,90 @@ readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[1;33m'
 readonly NC='\033[0m'
 
-readonly LARK_DESC="飞书 Linux版"
+readonly TRAE_DESC="Trae Linux版"
 
-readonly DOWNLOAD_API_BASE="https://www.larksuite.com/api/package_info"
+readonly DOWNLOAD_API_GLOBAL="https://api.trae.ai/icube/api/v1/native/version/trae/latest"
+readonly DOWNLOAD_API_CN="https://api.trae.ai/icube/api/v1/native/version/trae/cn/latest"
+
+# 默认安装国际版
+USE_CN=false
+
+usage() {
+    echo "用法: $0 [选项]"
+    echo
+    echo "选项:"
+    echo "  -c, --cn    安装中国版 (默认安装国际版)"
+    echo "  -h, --help  显示帮助信息"
+    exit 0
+}
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -c|--cn)
+                USE_CN=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                ;;
+            *)
+                print_msg "$RED" "错误: 未知选项 $1"
+                usage
+                ;;
+        esac
+    done
+}
+
+get_download_api() {
+    if [[ "$USE_CN" == true ]]; then
+        echo "$DOWNLOAD_API_CN"
+    else
+        echo "$DOWNLOAD_API_GLOBAL"
+    fi
+}
+
+# 缓存版本信息
+VERSION_INFO=""
+
+get_version_info() {
+    if [[ -z "$VERSION_INFO" ]]; then
+        local api
+        api=$(get_download_api)
+        VERSION_INFO=$(curl -fsSL "$api") || {
+            print_msg "$RED" "获取版本信息失败"
+            exit 1
+        }
+    fi
+    echo "$VERSION_INFO"
+}
 
 get_latest_version() {
-    local platform=$1
     local info
-    info=$(curl -fsSL "$DOWNLOAD_API_BASE?platform=$platform") || {
-        print_msg "$RED" "获取版本信息失败"
-        exit 1
-    }
-    echo "$info" | jq -r '.data.version_number'
+    info=$(get_version_info)
+    echo "$info" | jq -r '.data.manifest.linux.download[0]["x64.deb"]' | grep -oP 'stable/\K[0-9.]+'
 }
 
 get_download_url() {
-    local platform=$1
+    local arch=$1
+    local pkg_type=$2
     local info
-    info=$(curl -fsSL "$DOWNLOAD_API_BASE?platform=$platform") || {
-        print_msg "$RED" "获取版本信息失败"
-        exit 1
-    }
-    echo "$info" | jq -r '.data.download_link'
+    info=$(get_version_info)
+
+    case "$arch" in
+        x86_64|amd64)
+            case "$pkg_type" in
+                rpm) echo "$info" | jq -r '.data.manifest.linux.download[0]["x64.rpm"]' ;;
+                deb) echo "$info" | jq -r '.data.manifest.linux.download[0]["x64.deb"]' ;;
+            esac
+            ;;
+        aarch64|arm64)
+            case "$pkg_type" in
+                rpm) echo "$info" | jq -r '.data.manifest.linux.download[0]["arm64.rpm"]' ;;
+                deb) echo "$info" | jq -r '.data.manifest.linux.download[0]["arm64.deb"]' ;;
+            esac
+            ;;
+    esac
 }
 
 print_msg() {
@@ -52,7 +114,7 @@ print_msg() {
 }
 
 cleanup() {
-    rm -f /tmp/lark.rpm /tmp/lark.deb
+    rm -f /tmp/trae.rpm /tmp/trae.deb
 }
 
 trap cleanup EXIT
@@ -118,27 +180,7 @@ detect_package_manager() {
     fi
 }
 
-get_platform() {
-    local arch=$1
-    local pkg_type=$2
-
-    case "$arch" in
-        x86_64)
-            case "$pkg_type" in
-                rpm) echo "11" ;;
-                deb) echo "10" ;;
-            esac
-            ;;
-        aarch64|arm64)
-            case "$pkg_type" in
-                rpm) echo "13" ;;
-                deb) echo "12" ;;
-            esac
-            ;;
-    esac
-}
-
-install_lark() {
+install_trae() {
     local arch
     arch=$(detect_arch)
     local arch_rpm
@@ -149,41 +191,36 @@ install_lark() {
     pkg_type=$(detect_package_manager)
     local download_url
     local pkg_file
-    local lark_version
 
-    case "$pkg_type" in
-        rpm)
-            lark_version=$(get_latest_version "11")
-            ;;
-        deb)
-            lark_version=$(get_latest_version "10")
-            ;;
-    esac
+    local edition
+    if [[ "$USE_CN" == true ]]; then
+        edition="中国版"
+    else
+        edition="国际版"
+    fi
 
-    print_msg "$GREEN" "https://www.larksuite.com/zh_cn/download?from=navbar"
+    print_msg "$GREEN" "https://www.trae.ai/"
     echo
 
+    print_msg "$YELLOW" "安装版本: $edition"
     print_msg "$YELLOW" "检测到架构: $arch"
     print_msg "$YELLOW" "检测到包管理器: $pkg_type"
-    print_msg "$YELLOW" "最新版本: $lark_version"
 
     case "$pkg_type" in
         rpm)
-            local platform
-            platform=$(get_platform "$arch_rpm" "rpm")
-            download_url=$(get_download_url "$platform")
-            pkg_file="/tmp/lark.rpm"
-            print_msg "$YELLOW" "正在下载飞书 RPM 包..."
+            download_url=$(get_download_url "$arch_rpm" "rpm")
+            pkg_file="/tmp/trae.rpm"
+            print_msg "$YELLOW" "正在下载 Trae $edition RPM 包..."
             if curl -fsSL -o "$pkg_file" "$download_url"; then
                 print_msg "$GREEN" "下载完成，正在检查安装状态..."
-                if rpm -q Lark &>/dev/null; then
-                    print_msg "$YELLOW" "检测到飞书已安装，正在更新..."
+                if rpm -q trae &>/dev/null; then
+                    print_msg "$YELLOW" "检测到 Trae 已安装，正在更新..."
                     sudo dnf install -y "$pkg_file"
-                    print_msg "$GREEN" "飞书更新成功！"
+                    print_msg "$GREEN" "Trae 更新成功！"
                 else
-                    print_msg "$YELLOW" "正在安装飞书..."
+                    print_msg "$YELLOW" "正在安装 Trae..."
                     sudo dnf install -y "$pkg_file"
-                    print_msg "$GREEN" "飞书安装成功！"
+                    print_msg "$GREEN" "Trae 安装成功！"
                 fi
             else
                 print_msg "$RED" "下载失败，请检查网络连接"
@@ -191,15 +228,13 @@ install_lark() {
             fi
             ;;
         deb)
-            local platform
-            platform=$(get_platform "$arch_deb" "deb")
-            download_url=$(get_download_url "$platform")
-            pkg_file="/tmp/lark.deb"
-            print_msg "$YELLOW" "正在下载飞书 DEB 包..."
+            download_url=$(get_download_url "$arch_deb" "deb")
+            pkg_file="/tmp/trae.deb"
+            print_msg "$YELLOW" "正在下载 Trae $edition DEB 包..."
             if curl -fsSL -o "$pkg_file" "$download_url"; then
                 print_msg "$GREEN" "下载完成，正在安装..."
                 sudo dpkg -i "$pkg_file" || sudo apt install -f -y
-                print_msg "$GREEN" "飞书安装成功！"
+                print_msg "$GREEN" "Trae 安装成功！"
             else
                 print_msg "$RED" "下载失败，请检查网络连接"
                 exit 1
@@ -223,14 +258,19 @@ main() {
         exit 1
     fi
 
-    local lark_version
-    lark_version=$(get_latest_version "10")
+    parse_args "$@"
 
-    print_msg "$GREEN" "=== $LARK_DESC 安装脚本 ==="
-    print_msg "$GREEN" "版本: $lark_version"
+    local edition
+    if [[ "$USE_CN" == true ]]; then
+        edition="中国版"
+    else
+        edition="国际版"
+    fi
+
+    print_msg "$GREEN" "=== $TRAE_DESC ($edition) 安装脚本 ==="
     echo
 
-    install_lark
+    install_trae
 }
 
 main "$@"

@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+#============================================================
+# File: wps.sh
+# Description: 安装 WPS Office Linux 版
+# URL: https://www.wps.cn/product/wpslinux
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-13
+# UpdatedAt: 2026-03-13
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
 
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'

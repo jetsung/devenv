@@ -4,13 +4,13 @@ set shell := ["bash", "-c"]
 datasync:
     cd "$$HOME/myfiles" && rclone-datasync.sh
 
-# 基础安装 install <包名>
-install package:
+# 基础安装 install <包名> <其它参数>
+install package *args:
     @if [[ "{{package}}" == "all" ]]; then \
         echo "Installing all packages..." ; \
         find . -mindepth 2 -maxdepth 2 -type f -name "*.sh" -not -path "./setting/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
     else \
-        find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./setting/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; echo "Installing $(basename "$script" .sh)..."; bash "$script"' _ {} \; ;\
+        find . -mindepth 2 -maxdepth 2 -type f -name "*{{package}}*" -not -path "./setting/*" -not -path "./utils/*" -not -path "./.*" -exec bash -c 'script="$1"; shift; echo "Installing $(basename "$script" .sh)..."; bash "$script" "$@"' _ {} {{args}} \; ;\
     fi
 
 # 搜索可安装的软件

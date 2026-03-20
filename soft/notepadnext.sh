@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: notepadnext.sh
+# Description: 下载 NotepadNext 编辑器 AppImage
+# URL: https://github.com/dail8859/NotepadNext
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 # 颜色定义
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'

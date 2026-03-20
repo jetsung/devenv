@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: base.sh
+# Description: 安装基础开发工具 (gcc, make, rpm 等)
+# URL: https://fx4.cn/base
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-14
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 # Detect OS
 if [ -f /etc/os-release ]; then
     # shellcheck disable=SC1091

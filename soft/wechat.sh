@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+#============================================================
+# File: wechat.sh
+# Description: 安装微信 Linux 客户端
+# URL: https://linux.weixin.qq.com/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-13
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
 
 # 颜色定义
 readonly RED='\033[0;31m'

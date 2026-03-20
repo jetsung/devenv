@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: ohmyzsh.sh
+# Description: 安装 Oh My Zsh 及常用插件
+# URL: https://ohmyz.sh/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 if [[ -d "$HOME/.oh-my-zsh" ]]; then
     pushd "$HOME/.oh-my-zsh" >/dev/null || exit
     git pull

@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+#============================================================
+# File: gpg.sh
+# Description: GPG 密钥管理工具 (导入/导出/列出)
+# URL: https://gnupg.org/
+# Author: Jetsung Chan <i@jetsung.com>
+# Version: 0.1.0
+# CreatedAt: 2026-03-03
+# UpdatedAt: 2026-03-03
+#============================================================
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -eux
+else
+    set -euo pipefail
+fi
+
 # Function to display usage information
 usage() {
     echo "Usage:"
