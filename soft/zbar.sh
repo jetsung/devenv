@@ -2,7 +2,7 @@
 
 #============================================================
 # File: zbar.sh
-# Description: 
+# Description: 安装 ZBar（条形码/二维码扫描库）
 # URL: https://github.com/mchehab/zbar
 # Author: Jetsung Chan <i@jetsung.com>
 # Version: 0.1.0
