@@ -39,6 +39,38 @@ configure_alternatives() {
   sudo update-alternatives --install "$path" "$name" /usr/local/bin/nvim "$priority"
 }
 
+# 以 depth=1 克隆仓库到指定目录
+clone_repo() {
+  local repo_url=$1
+  local target_dir=$2
+  mkdir -p "$target_dir"
+  git clone --depth=1 "$repo_url" "$target_dir"
+}
+
+config() {
+  local nvim_config nvim_git
+  nvim_config="$HOME/.config/nvim"
+  nvim_git="https://github.com/jdhao/nvim-config.git"
+
+  if [[ -d "$nvim_config" ]]; then
+    # 目录已存在：检查是否为预期仓库，是则更新，否则删除重建
+    local remote_url
+    remote_url="$(git -C "$nvim_config" remote -v 2>/dev/null | head -1 | awk '{print $2}')"
+    if [[ "$remote_url" = "$nvim_git" ]]; then
+      print_msg "$YELLOW" "更新 nvim 配置..."
+      git -C "$nvim_config" pull origin main
+    else
+      print_msg "$YELLOW" "仓库不匹配，重新克隆 nvim 配置..."
+      rm -rf "$nvim_config"
+      clone_repo "$nvim_git" "$nvim_config"
+    fi
+  else
+    # 目录不存在：直接 clone
+    print_msg "$YELLOW" "克隆 nvim 配置..."
+    clone_repo "$nvim_git" "$nvim_config"
+  fi
+}
+
 # 主函数
 main() {
   # 检查 nvim 是否安装
@@ -64,6 +96,10 @@ main() {
 
   print_msg "$GREEN" "Neovim 配置完成！"
   print_msg "$GREEN" "当前 vi 指向: $(readlink -f /usr/bin/vi 2>/dev/null || echo '未设置')"
+
+  if [[ "${1:-}" = "config" ]]; then
+    config
+  fi
 }
 
 main "$@"
