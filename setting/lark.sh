@@ -2,12 +2,12 @@
 
 #============================================================
 # File: lark.sh
-# Description: 配置飞书桌面快捷方式
+# Description: 修复 Lark 配置
 # URL: https://www.larksuite.com/
 # Author: Jetsung Chan <i@jetsung.com>
-# Version: 0.1.0
+# Version: 0.2.0
 # CreatedAt: 2026-03-03
-# UpdatedAt: 2026-03-03
+# UpdatedAt: 2026-07-03
 #============================================================
 
 if [[ -n "${DEBUG:-}" ]]; then
@@ -16,15 +16,8 @@ else
     set -euo pipefail
 fi
 
-sudo sed -i 's#NoDisplay=.*#NoDisplay=false#' /usr/share/applications/bytedance-lark.desktop
+fix_fonts() {
+    sudo dnf install -y liberation-sans-fonts liberation-serif-fonts liberation-mono-fonts google-noto-sans-fonts google-noto-serif-fonts google-noto-sans-mono-fonts
+}
 
-sudo update-desktop-database
-sudo update-desktop-database /usr/share/applications
-
-if [ "$XDG_CURRENT_DESKTOP" = "KDE" ] || [ "$DESKTOP_SESSION" = "plasma" ]; then
-    kbuildsycoca6 --noincremental
-fi
-
-sudo update-mime-database /usr/share/mime
-
-desktop-file-validate /usr/share/applications/bytedance-lark.desktop
+fix_fonts
